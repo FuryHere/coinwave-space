@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabase";
 import Head from "next/head";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 interface Project {
   id: string;
@@ -124,7 +125,7 @@ export default function ProjectsPage() {
           </div>
         )}
       </div>
-      <Footer /> {/* ← dodaj przed zamknięciem </div> */}
+      <Footer />
     </div>
   );
 }
