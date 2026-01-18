@@ -62,9 +62,11 @@ const Home: NextPage = () => {
             <button className="px-8 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:shadow-lg hover:shadow-cyan-500/50 transition-all">
               Start Free
             </button>
-            <button className="px-8 py-3 rounded-lg border border-slate-700 text-slate-300 font-semibold hover:bg-slate-800 transition-all">
-              View Projects →
-            </button>
+            <Link href="/projects">
+              <button className="px-8 py-3 rounded-lg border border-slate-700 text-slate-300 font-semibold hover:bg-slate-800 transition-all">
+                View Projects →
+              </button>
+            </Link>
           </div>
 
           {/* Stats */}
