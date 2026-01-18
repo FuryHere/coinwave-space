@@ -1,43 +1,75 @@
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import Head from 'next/head'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { TrendingUp, CheckCircle, Flame, DollarSign, Rocket } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import BackgroundEffects from '../components/BackgroundEffects'
-import ProtectedRoute from '../components/ProtectedRoute'
-import GlassCard from '../components/ui/GlassCard'
-import AnimatedCard from '../components/ui/AnimatedCard'
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import Head from "next/head";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  TrendingUp,
+  CheckCircle,
+  Flame,
+  DollarSign,
+  Rocket,
+} from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import BackgroundEffects from "../components/BackgroundEffects";
+import ProtectedRoute from "../components/ProtectedRoute";
+import GlassCard from "../components/ui/GlassCard";
+import AnimatedCard from "../components/ui/AnimatedCard";
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth()
-  const router = useRouter()
+  const { user, loading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login')
+      router.push("/login");
     }
-  }, [user, loading, router])
+  }, [user, loading, router]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-cyan-500"></div>
       </div>
-    )
+    );
   }
 
-  if (!user) return null
+  if (!user) return null;
 
   const stats = [
-    { icon: <TrendingUp className="w-6 h-6" />, label: 'Farming', value: '0', sublabel: 'Active projects', gradient: 'from-cyan-500 to-blue-500' },
-    { icon: <CheckCircle className="w-6 h-6" />, label: 'Completed', value: '0', sublabel: 'Tasks done', gradient: 'from-green-500 to-emerald-500' },
-    { icon: <Flame className="w-6 h-6" />, label: 'Streak', value: '0', sublabel: 'Days active', gradient: 'from-orange-500 to-red-500' },
-    { icon: <DollarSign className="w-6 h-6" />, label: 'Potential', value: '$0', sublabel: 'Estimated value', gradient: 'from-purple-500 to-pink-500' }
-  ]
+    {
+      icon: <TrendingUp className="w-6 h-6" />,
+      label: "Farming",
+      value: "0",
+      sublabel: "Active projects",
+      gradient: "from-cyan-500 to-blue-500",
+    },
+    {
+      icon: <CheckCircle className="w-6 h-6" />,
+      label: "Completed",
+      value: "0",
+      sublabel: "Tasks done",
+      gradient: "from-green-500 to-emerald-500",
+    },
+    {
+      icon: <Flame className="w-6 h-6" />,
+      label: "Streak",
+      value: "0",
+      sublabel: "Days active",
+      gradient: "from-orange-500 to-red-500",
+    },
+    {
+      icon: <DollarSign className="w-6 h-6" />,
+      label: "Potential",
+      value: "$0",
+      sublabel: "Estimated value",
+      gradient: "from-purple-500 to-pink-500",
+    },
+  ];
+
+  const emailPrefix = user.email ? user.email.split("@")[0] : "User";
 
   return (
     <ProtectedRoute>
@@ -60,7 +92,9 @@ export default function DashboardPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-2">
               <span className="gradient-text">Dashboard</span>
             </h1>
-            <p className="text-slate-400 text-lg">Welcome back, {user.email?.split('@')[0]} 👋</p>
+            <p className="text-slate-400 text-lg">
+              Welcome back, {emailPrefix} 👋
+            </p>
           </motion.div>
 
           {/* Stats Grid */}
@@ -69,12 +103,18 @@ export default function DashboardPage() {
               <AnimatedCard key={index} delay={index * 0.1}>
                 <GlassCard className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.gradient} text-white`}>
+                    <div
+                      className={`p-3 rounded-xl bg-gradient-to-r ${stat.gradient} text-white`}
+                    >
                       {stat.icon}
                     </div>
                   </div>
-                  <div className="text-sm text-slate-400 mb-1">{stat.label}</div>
-                  <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+                  <div className="text-sm text-slate-400 mb-1">
+                    {stat.label}
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    {stat.value}
+                  </div>
                   <div className="text-xs text-slate-500">{stat.sublabel}</div>
                 </GlassCard>
               </AnimatedCard>
@@ -92,8 +132,37 @@ export default function DashboardPage() {
                   <h2 className="text-2xl font-bold text-white">Quick Start</h2>
                 </div>
                 <p className="text-slate-400 mb-6 leading-relaxed">
-                  Start tracking your first project to begin farming airdrops and maximize your earnings
+                  Start tracking your first project to begin farming airdrops
+                  and maximize your earnings
                 </p>
                 <Link
                   href="/projects"
-                  className="inline
+                  className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300"
+                >
+                  Browse Projects
+                </Link>
+              </GlassCard>
+            </AnimatedCard>
+
+            <AnimatedCard delay={0.5}>
+              <GlassCard className="p-8">
+                <h2 className="text-2xl font-bold text-white mb-6">
+                  Recent Activity
+                </h2>
+                <div className="text-center py-12">
+                  <div className="text-5xl mb-3">📊</div>
+                  <p className="text-slate-400">No activity yet</p>
+                  <p className="text-sm text-slate-500 mt-2">
+                    Start farming to see your progress!
+                  </p>
+                </div>
+              </GlassCard>
+            </AnimatedCard>
+          </div>
+        </div>
+
+        <Footer />
+      </div>
+    </ProtectedRoute>
+  );
+}
