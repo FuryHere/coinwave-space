@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import Head from "next/head";
-import Link from "next/link";
+import { motion } from "framer-motion";
+import { Search, Filter } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ProjectCard from "../components/ProjectCard";
+import BackgroundEffects from "../components/BackgroundEffects";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 interface Project {
   id: string;
@@ -20,6 +24,7 @@ interface Project {
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchProjects();
@@ -30,7 +35,8 @@ export default function ProjectsPage() {
       const { data, error } = await supabase
         .from("projects")
         .select("*")
-        .order("tier");
+        .order("is_featured", { ascending: false })
+        .order("tier", { ascending: true });
 
       if (error) throw error;
       setProjects(data || []);
@@ -41,90 +47,80 @@ export default function ProjectsPage() {
     }
   }
 
+  const filteredProjects = projects.filter(
+    (project) =>
+      project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.description.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
       <Head>
         <title>Projects | CoinWave</title>
       </Head>
+
+      <BackgroundEffects />
       <Navbar />
+
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-              Airdrop Projects
-            </span>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-5xl md:text-6xl font-bold mb-4">
+            <span className="gradient-text">Airdrop Projects</span>
           </h1>
-          <p className="text-xl text-slate-400">
+          <p className="text-xl text-slate-400 mb-8">
             Track {projects.length} active opportunities
           </p>
-        </div>
 
-        {loading ? (
-          <div className="text-center py-20">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-cyan-500"></div>
-            <p className="text-slate-400 mt-4">Loading...</p>
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search projects..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-12 py-4 bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors"
+              />
+              <button className="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-slate-700/50 rounded-lg transition-colors">
+                <Filter className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
           </div>
+        </motion.div>
+
+        {/* Projects Grid */}
+        {loading ? (
+          <LoadingSpinner />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
-              <Link key={project.id} href={`/projects/${project.slug}`}>
-                <div className="p-6 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/50 transition-all cursor-pointer group">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      {project.avatar_url ? (
-                        <img
-                          src={project.avatar_url}
-                          alt={project.name}
-                          className="w-12 h-12 rounded-lg"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold">
-                          {project.name[0]}
-                        </div>
-                      )}
-                      <div>
-                        <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">
-                          {project.name}
-                        </h3>
-                        <p className="text-sm text-slate-400">
-                          {project.status}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="px-3 py-1 rounded-full text-sm font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-white">
-                      {project.tier}
-                    </span>
-                  </div>
-
-                  <p className="text-slate-400 text-sm mb-4 line-clamp-2">
-                    {project.description}
-                  </p>
-
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.chains.slice(0, 3).map((chain) => (
-                      <span
-                        key={chain}
-                        className="px-2 py-1 rounded bg-slate-700/50 text-xs text-slate-300"
-                      >
-                        {chain}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-700/50">
-                    <span className="text-sm text-slate-400">
-                      {project.follower_count} farming
-                    </span>
-                    <span className="text-sm text-cyan-400 group-hover:text-cyan-300">
-                      View Details →
-                    </span>
-                  </div>
-                </div>
-              </Link>
+            {filteredProjects.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
             ))}
           </div>
         )}
+
+        {!loading && filteredProjects.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-20"
+          >
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-2xl font-bold text-white mb-2">
+              No projects found
+            </h3>
+            <p className="text-slate-400">Try adjusting your search terms</p>
+          </motion.div>
+        )}
       </div>
+
       <Footer />
     </div>
   );
