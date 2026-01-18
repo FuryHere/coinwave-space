@@ -149,3 +149,7 @@ export default function ProjectsPage() {
     </div>
   );
 }
+
+export async function getServerSideProps() {
+  return { props: {} };
+}
