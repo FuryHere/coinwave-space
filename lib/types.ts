@@ -4,13 +4,18 @@ export interface Project {
   slug: string;
   description: string;
   tier: "S" | "A" | "B" | "C";
-  status: "testnet" | "mainnet" | "completed";
+  status: "testnet" | "mainnet" | "completed" | "claiming" | "farming";
   chains: string[];
   avatar_url: string;
   is_featured: boolean;
   follower_count: number;
+  difficulty: "Easy" | "Medium" | "Hard";
+  raised_amount: string;
+  backers_count: number;
+  cost: "Free" | "Paid";
   created_at: string;
   updated_at: string;
+  admin_updated_at: string;
 }
 
 export interface Task {
@@ -49,3 +54,6 @@ export interface UserTaskProgress {
   task_id: string;
   completed_at: string;
 }
+
+export type ThemeMode = "cyber" | "basic";
+export type ColorMode = "dark" | "light";

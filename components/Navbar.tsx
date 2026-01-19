@@ -1,8 +1,8 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
 import { signOut } from "../lib/supabase";
-import { useRouter } from "next/router";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Navbar() {
@@ -14,14 +14,17 @@ export default function Navbar() {
     router.push("/");
   };
 
+  const isActive = (path: string) =>
+    router.pathname === path || router.pathname.startsWith(path);
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className="sticky top-0 z-50 border-b border-slate-800/50 bg-slate-950/50 backdrop-blur-2xl"
+      className="sticky top-0 z-50 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-2xl"
     >
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-[1600px] mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="text-3xl group-hover:scale-110 transition-transform duration-300">
@@ -33,22 +36,35 @@ export default function Navbar() {
           <div className="flex items-center space-x-6">
             <Link
               href="/"
-              className="text-slate-300 hover:text-white transition-colors duration-200 font-medium"
+              className={`text-sm font-medium transition-colors duration-200 ${
+                isActive("/") && router.pathname === "/"
+                  ? "text-cyan-400"
+                  : "text-slate-300 hover:text-white"
+              }`}
             >
               Home
             </Link>
             <Link
-              href="/projects"
-              className="text-slate-300 hover:text-white transition-colors duration-200 font-medium"
+              href="/airdrops"
+              className={`flex items-center gap-2 text-sm font-medium transition-colors duration-200 ${
+                isActive("/airdrops") || isActive("/projects")
+                  ? "text-cyan-400"
+                  : "text-slate-300 hover:text-white"
+              }`}
             >
-              Projects
+              <Zap className="w-4 h-4" />
+              <span>Airdrops</span>
             </Link>
 
             {user ? (
               <>
                 <Link
                   href="/dashboard"
-                  className="text-slate-300 hover:text-white transition-colors duration-200 font-medium"
+                  className={`text-sm font-medium transition-colors duration-200 ${
+                    isActive("/dashboard")
+                      ? "text-cyan-400"
+                      : "text-slate-300 hover:text-white"
+                  }`}
                 >
                   Dashboard
                 </Link>
@@ -69,7 +85,7 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="text-slate-300 hover:text-white transition-colors duration-200 font-medium"
+                  className="text-sm font-medium text-slate-300 hover:text-white transition-colors duration-200"
                 >
                   Sign In
                 </Link>
