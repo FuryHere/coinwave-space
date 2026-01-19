@@ -2,21 +2,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import {
-  TrendingUp,
-  CheckCircle,
-  Flame,
-  DollarSign,
-  Rocket,
-} from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import BackgroundEffects from "../components/BackgroundEffects";
-import ProtectedRoute from "../components/ProtectedRoute";
-import GlassCard from "../components/ui/GlassCard";
-import AnimatedCard from "../components/ui/AnimatedCard";
+import { signOut } from "../lib/supabase";
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
@@ -28,141 +15,97 @@ export default function DashboardPage() {
     }
   }, [user, loading, router]);
 
-  if (loading) {
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/");
+  };
+
+  if (loading || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-cyan-500"></div>
       </div>
     );
   }
 
-  if (!user) return null;
-
-  const stats = [
-    {
-      icon: <TrendingUp className="w-6 h-6" />,
-      label: "Farming",
-      value: "0",
-      sublabel: "Active projects",
-      gradient: "from-cyan-500 to-blue-500",
-    },
-    {
-      icon: <CheckCircle className="w-6 h-6" />,
-      label: "Completed",
-      value: "0",
-      sublabel: "Tasks done",
-      gradient: "from-green-500 to-emerald-500",
-    },
-    {
-      icon: <Flame className="w-6 h-6" />,
-      label: "Streak",
-      value: "0",
-      sublabel: "Days active",
-      gradient: "from-orange-500 to-red-500",
-    },
-    {
-      icon: <DollarSign className="w-6 h-6" />,
-      label: "Potential",
-      value: "$0",
-      sublabel: "Estimated value",
-      gradient: "from-purple-500 to-pink-500",
-    },
-  ];
-
-  const emailPrefix = user.email ? user.email.split("@")[0] : "User";
-
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
-        <Head>
-          <title>Dashboard | CoinWave</title>
-        </Head>
+    <div className="min-h-screen bg-slate-950">
+      <Head>
+        <title>Dashboard | CoinWave</title>
+      </Head>
 
-        <BackgroundEffects />
-        <Navbar />
-
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
-          >
-            <h1 className="text-4xl md:text-5xl font-bold mb-2">
-              <span className="gradient-text">Dashboard</span>
-            </h1>
-            <p className="text-slate-400 text-lg">
-              Welcome back, {emailPrefix} 👋
-            </p>
-          </motion.div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => (
-              <AnimatedCard key={index} delay={index * 0.1}>
-                <GlassCard className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div
-                      className={`p-3 rounded-xl bg-gradient-to-r ${stat.gradient} text-white`}
-                    >
-                      {stat.icon}
-                    </div>
-                  </div>
-                  <div className="text-sm text-slate-400 mb-1">
-                    {stat.label}
-                  </div>
-                  <div className="text-3xl font-bold text-white mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs text-slate-500">{stat.sublabel}</div>
-                </GlassCard>
-              </AnimatedCard>
-            ))}
+      {/* Navbar */}
+      <nav className="border-b border-slate-800 bg-slate-900/50 sticky top-0 z-50 backdrop-blur-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="flex items-center gap-2">
+              <span className="text-2xl">🌊</span>
+              <span className="text-xl font-bold text-white">CoinWave</span>
+            </Link>
+            <div className="flex items-center gap-6">
+              <Link href="/" className="text-slate-300 hover:text-white">
+                Home
+              </Link>
+              <Link
+                href="/airdrops"
+                className="text-slate-300 hover:text-white"
+              >
+                Airdrops
+              </Link>
+              <Link href="/dashboard" className="text-cyan-400">
+                Dashboard
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="px-4 py-2 border border-slate-700 hover:border-slate-600 text-white rounded-lg transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
+        </div>
+      </nav>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <AnimatedCard delay={0.4}>
-              <GlassCard className="p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
-                    <Rocket className="w-6 h-6" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-white">Quick Start</h2>
-                </div>
-                <p className="text-slate-400 mb-6 leading-relaxed">
-                  Start tracking your first project to begin farming airdrops
-                  and maximize your earnings
-                </p>
-                <Link
-                  href="/projects"
-                  className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300"
-                >
-                  Browse Projects
-                </Link>
-              </GlassCard>
-            </AnimatedCard>
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold text-white mb-2">Dashboard</h1>
+        <p className="text-slate-400 mb-8">Welcome back, {user.email}</p>
 
-            <AnimatedCard delay={0.5}>
-              <GlassCard className="p-8">
-                <h2 className="text-2xl font-bold text-white mb-6">
-                  Recent Activity
-                </h2>
-                <div className="text-center py-12">
-                  <div className="text-5xl mb-3">📊</div>
-                  <p className="text-slate-400">No activity yet</p>
-                  <p className="text-sm text-slate-500 mt-2">
-                    Start farming to see your progress!
-                  </p>
-                </div>
-              </GlassCard>
-            </AnimatedCard>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-2xl">
+            <div className="text-sm text-slate-400 mb-1">Farming</div>
+            <div className="text-3xl font-bold text-white">0</div>
+            <div className="text-xs text-slate-500 mt-1">Active projects</div>
+          </div>
+          <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-2xl">
+            <div className="text-sm text-slate-400 mb-1">Completed</div>
+            <div className="text-3xl font-bold text-cyan-400">0</div>
+            <div className="text-xs text-slate-500 mt-1">Tasks done</div>
+          </div>
+          <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-2xl">
+            <div className="text-sm text-slate-400 mb-1">Potential</div>
+            <div className="text-3xl font-bold text-green-400">$0</div>
+            <div className="text-xs text-slate-500 mt-1">Estimated value</div>
           </div>
         </div>
 
-        <Footer />
+        {/* Quick Start */}
+        <div className="p-8 bg-slate-800/50 border border-slate-700 rounded-2xl text-center">
+          <div className="text-5xl mb-4">🚀</div>
+          <h2 className="text-2xl font-bold text-white mb-2">Start Farming</h2>
+          <p className="text-slate-400 mb-6">
+            Browse airdrops and start tracking projects to maximize your
+            earnings
+          </p>
+          <Link
+            href="/airdrops"
+            className="inline-block px-8 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-semibold transition-colors"
+          >
+            Browse Airdrops
+          </Link>
+        </div>
       </div>
-    </ProtectedRoute>
+    </div>
   );
 }
