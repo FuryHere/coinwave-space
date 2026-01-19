@@ -1,128 +1,112 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import Head from "next/head";
+import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
-import Navbar from "../components/Navbar";
-import ProtectedRoute from "../components/ProtectedRoute";
+import { signOut } from "../lib/supabase";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/");
+  };
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-cyan-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <Head>
-          <title>Profile | CoinWave</title>
-        </Head>
+    <div className="min-h-screen bg-slate-950">
+      <Head>
+        <title>Profile | CoinWave</title>
+      </Head>
 
-        <Navbar />
+      {/* Navbar */}
+      <nav className="border-b border-slate-800 bg-slate-900/50 sticky top-0 z-50 backdrop-blur-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="flex items-center gap-2">
+              <span className="text-2xl">🌊</span>
+              <span className="text-xl font-bold text-white">CoinWave</span>
+            </Link>
+            <div className="flex items-center gap-6">
+              <Link href="/" className="text-slate-300 hover:text-white">
+                Home
+              </Link>
+              <Link
+                href="/airdrops"
+                className="text-slate-300 hover:text-white"
+              >
+                Airdrops
+              </Link>
+              <Link
+                href="/dashboard"
+                className="text-slate-300 hover:text-white"
+              >
+                Dashboard
+              </Link>
+              <Link href="/profile" className="text-cyan-400">
+                Profile
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="px-4 py-2 border border-slate-700 hover:border-slate-600 text-white rounded-lg transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-        <div className="max-w-4xl mx-auto px-4 py-12">
-          <h1 className="text-4xl font-bold mb-8">
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Profile Settings
-            </span>
-          </h1>
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold text-white mb-8">Profile</h1>
 
+        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
           <div className="space-y-6">
-            {/* Account Info */}
-            <div className="p-8 rounded-lg bg-slate-800/50 border border-slate-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Account Information
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-slate-400 mb-1">
-                    Email
-                  </label>
-                  <div className="px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white">
-                    {user?.email}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-400 mb-1">
-                    User ID
-                  </label>
-                  <div className="px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-slate-400 text-sm font-mono">
-                    {user?.id}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-400 mb-1">
-                    Member Since
-                  </label>
-                  <div className="px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white">
-                    {user?.created_at
-                      ? new Date(user.created_at).toLocaleDateString()
-                      : "N/A"}
-                  </div>
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                Email
+              </label>
+              <div className="px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white">
+                {user.email}
               </div>
             </div>
 
-            {/* Subscription */}
-            <div className="p-8 rounded-lg bg-slate-800/50 border border-slate-700/50">
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Subscription
-              </h2>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-lg font-semibold text-white mb-1">
-                    Free Plan
-                  </div>
-                  <div className="text-sm text-slate-400">
-                    Upgrade to PRO for unlimited tracking
-                  </div>
-                </div>
-                <button className="px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:shadow-lg hover:shadow-cyan-500/50 transition-all">
-                  Upgrade to PRO
-                </button>
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                User ID
+              </label>
+              <div className="px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-slate-400 text-sm font-mono">
+                {user.id}
               </div>
             </div>
 
-            {/* Preferences */}
-            <div className="p-8 rounded-lg bg-slate-800/50 border border-slate-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Preferences
-              </h2>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-white font-medium">
-                      Email Notifications
-                    </div>
-                    <div className="text-sm text-slate-400">
-                      Receive updates about new projects
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      defaultChecked
-                    />
-                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
-                  </label>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-white font-medium">Task Reminders</div>
-                    <div className="text-sm text-slate-400">
-                      Get reminded about daily tasks
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      defaultChecked
-                    />
-                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
-                  </label>
-                </div>
-              </div>
+            <div className="pt-6 border-t border-slate-700">
+              <button
+                onClick={handleSignOut}
+                className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors"
+              >
+                Sign Out
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+    </div>
   );
 }
