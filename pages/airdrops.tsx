@@ -162,6 +162,45 @@ export default function AirdropsPage() {
           </select>
         </div>
 
+        {/* Featured Airdrops */}
+        {!loading && filteredProjects.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-white mb-4">🔥 Featured</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {filteredProjects.slice(0, 3).map((project) => (
+                <Link
+                  key={`featured-${project.id}`}
+                  href={`/airdrops/${project.slug}`}
+                >
+                  <div className="p-4 bg-gradient-to-br from-slate-800/50 to-slate-800/30 border border-slate-700 hover:border-cyan-500/50 rounded-xl transition-all cursor-pointer group">
+                    <div className="flex items-center gap-3 mb-2">
+                      {project.avatar_url ? (
+                        <img
+                          src={project.avatar_url}
+                          alt={project.name}
+                          className="w-10 h-10 rounded-lg"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold">
+                          {project.name[0]}
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-bold text-white group-hover:text-cyan-400 transition-colors">
+                          {project.name}
+                        </h3>
+                        <p className="text-xs text-slate-400">
+                          {project.raised_amount || "TBA"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Table */}
         <div className="bg-slate-800/30 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden">
           {loading ? (
@@ -203,7 +242,7 @@ export default function AirdropsPage() {
                     return (
                       <tr
                         key={project.id}
-                        className="hover:bg-slate-800/30 transition-colors cursor-pointer"
+                        className="hover:bg-gradient-to-r hover:from-slate-800/50 hover:to-slate-800/30 transition-all cursor-pointer border-l-2 border-transparent hover:border-cyan-500"
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -230,7 +269,7 @@ export default function AirdropsPage() {
                         </td>
                         <td className="px-6 py-4">
                           <span
-                            className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${status.bg} border border-${status.text.replace("text-", "")}/30`}
+                            className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${status.bg} border border-slate-600/30`}
                           >
                             <span
                               className={`w-2 h-2 rounded-full ${status.dot} animate-pulse`}
